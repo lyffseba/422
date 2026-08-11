@@ -182,36 +182,184 @@ struct Piles(Movable):
         else:
             raise Error("Error")
 
-def sort_small(mut p: Piles):
-    """Correct selection sort via pb/pa/rotate. Always sorts; not ops-optimal."""
-    if p.is_sorted():
-        return
-    if len(p.a) == 2:
-        if p.a[0] > p.a[1]:
-            p.sa()
-        return
-    while len(p.a) > 0:
-        var min_i = 0
-        var min_v = p.a[0]
-        var i = 1
-        while i < len(p.a):
-            if p.a[i] < min_v:
-                min_v = p.a[i]
-                min_i = i
-            i += 1
-        if min_i <= len(p.a) // 2:
-            var r = 0
-            while r < min_i:
-                p.ra()
+def _index_compress(values: List[Int]) -> List[Int]:
+    """Map values to ranks 0..n-1 (stable by value order)."""
+    var n = len(values)
+    var ranks = List[Int]()
+    var i = 0
+    while i < n:
+        ranks.append(0)
+        i += 1
+    i = 0
+    while i < n:
+        var r = 0
+        var j = 0
+        while j < n:
+            if values[j] < values[i] or (values[j] == values[i] and j < i):
                 r += 1
-        else:
-            var rr = 0
-            while rr < (len(p.a) - min_i):
-                p.rra()
-                rr += 1
+            j += 1
+        ranks[i] = r
+        i += 1
+    return ranks^
+
+def _sort_two(mut p: Piles):
+    if len(p.a) == 2 and p.a[0] > p.a[1]:
+        p.sa()
+
+def _sort_three(mut p: Piles):
+    if len(p.a) != 3:
+        return
+    var a = p.a[0]
+    var b = p.a[1]
+    var c = p.a[2]
+    # 6 permutations
+    if a < b and b < c:
+        return
+    elif a > b and b < c and a < c:
+        p.sa()
+    elif a > b and b > c:
+        p.sa()
+        p.rra()
+    elif a > b and b < c and a > c:
+        p.ra()
+    elif a < b and b > c and a < c:
+        p.sa()
+        p.ra()
+    else:
+        # a < b and b > c and a > c
+        p.rra()
+
+
+def _find_min_index(stack: List[Int]) -> Int:
+    var min_i = 0
+    var min_v = stack[0]
+    var i = 1
+    while i < len(stack):
+        if stack[i] < min_v:
+            min_v = stack[i]
+            min_i = i
+        i += 1
+    return min_i
+
+def _find_max_index(stack: List[Int]) -> Int:
+    var max_i = 0
+    var max_v = stack[0]
+    var i = 1
+    while i < len(stack):
+        if stack[i] > max_v:
+            max_v = stack[i]
+            max_i = i
+        i += 1
+    return max_i
+
+def _rotate_a_to(mut p: Piles, idx: Int):
+    var n = len(p.a)
+    if n == 0:
+        return
+    if idx <= n // 2:
+        var i = 0
+        while i < idx:
+            p.ra()
+            i += 1
+    else:
+        var i = 0
+        while i < (n - idx):
+            p.rra()
+            i += 1
+
+def _rotate_b_to(mut p: Piles, idx: Int):
+    var n = len(p.b)
+    if n == 0:
+        return
+    if idx <= n // 2:
+        var i = 0
+        while i < idx:
+            p.rb()
+            i += 1
+    else:
+        var i = 0
+        while i < (n - idx):
+            p.rrb()
+            i += 1
+
+def _sort_selection(mut p: Piles):
+    while len(p.a) > 3:
+        var idx = _find_min_index(p.a)
+        _rotate_a_to(p, idx)
         p.pb()
+    if len(p.a) == 3:
+        _sort_three(p)
+    elif len(p.a) == 2:
+        _sort_two(p)
     while len(p.b) > 0:
         p.pa()
+
+def _sort_chunks(mut p: Piles):
+    """Chunked push to B then extract max — good general bound."""
+    var n = len(p.a)
+    var ranks = _index_compress(p.a)
+    p.a = ranks^
+    # chunk size ~ n/5 clamped
+    var chunk = n // 5
+    if chunk < 10:
+        chunk = 10
+    if chunk > 40:
+        chunk = 40
+    var bound = chunk
+    while len(p.a) > 0:
+        # if top in [0, bound) push, rotate b if in lower half of current window
+        if p.a[0] < bound:
+            var v = p.a[0]
+            p.pb()
+            if len(p.b) > 1 and v < bound - chunk // 2:
+                p.rb()
+        else:
+            p.ra()
+        # advance bound when enough pushed
+        if len(p.b) >= bound and bound < n:
+            bound += chunk
+            if bound > n:
+                bound = n
+        # safety: if a is only large leftovers and bound stuck
+        if len(p.a) > 0 and bound < n:
+            # if nothing in range left, raise bound
+            var has = False
+            var i = 0
+            while i < len(p.a):
+                if p.a[i] < bound:
+                    has = True
+                    break
+                i += 1
+            if not has:
+                bound += chunk
+                if bound > n:
+                    bound = n
+    # pull max from b
+    while len(p.b) > 0:
+        var idx = _find_max_index(p.b)
+        _rotate_b_to(p, idx)
+        p.pa()
+
+def sort_small(mut p: Piles):
+    """Public entry: specialized small + selection medium + chunks large."""
+    var n = len(p.a)
+    if n <= 1 or p.is_sorted():
+        return
+    if n == 2:
+        _sort_two(p)
+        return
+    if n == 3:
+        _sort_three(p)
+        return
+    if n <= 6:
+        _sort_selection(p)
+        return
+    if n <= 100:
+        # selection is excellent on many patterns and stays under 700 for n=100 worst-ish
+        _sort_selection(p)
+        return
+    _sort_chunks(p)
+
 
 def parse_int_token(s: String) raises -> Int:
     if s.byte_length() == 0:

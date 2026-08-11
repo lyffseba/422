@@ -124,3 +124,64 @@ def ft_split(s: String, sep: Int) -> List[String]:
     if cur.byte_length() > 0:
         out.append(cur)
     return out^
+
+def ft_substr(s: String, start: Int, length: Int) -> String:
+    var out = String()
+    if start < 0 or start >= s.byte_length() or length <= 0:
+        return out^
+    var i = start
+    var end = start + length
+    if end > s.byte_length():
+        end = s.byte_length()
+    while i < end:
+        out += chr(byte_at(s, i))
+        i += 1
+    return out^
+
+def ft_strchr(s: String, c: Int) -> Int:
+    """Return byte index of c or -1."""
+    var i = 0
+    while i < s.byte_length():
+        if byte_at(s, i) == c:
+            return i
+        i += 1
+    return -1
+
+def ft_strstr(hay: String, needle: String) -> Int:
+    """Return start index of needle in hay or -1."""
+    var nlen = needle.byte_length()
+    if nlen == 0:
+        return 0
+    var i = 0
+    while i + nlen <= hay.byte_length():
+        var j = 0
+        var ok = True
+        while j < nlen:
+            if byte_at(hay, i + j) != byte_at(needle, j):
+                ok = False
+                break
+            j += 1
+        if ok:
+            return i
+        i += 1
+    return -1
+
+def starts_with(s: String, prefix: String) -> Bool:
+    if prefix.byte_length() > s.byte_length():
+        return False
+    return ft_strnequ(s, prefix, prefix.byte_length())
+
+def strip_newline(s: String) -> String:
+    var n = s.byte_length()
+    while n > 0 and (byte_at(s, n - 1) == ord("\n") or byte_at(s, n - 1) == ord("\r")):
+        n -= 1
+    return ft_substr(s, 0, n)
+
+def ft_strtrim(s: String) -> String:
+    var a = 0
+    var b = s.byte_length()
+    while a < b and ft_iswhitespace(byte_at(s, a)):
+        a += 1
+    while b > a and ft_iswhitespace(byte_at(s, b - 1)):
+        b -= 1
+    return ft_substr(s, a, b - a)

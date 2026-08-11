@@ -1,7 +1,7 @@
-"""Lem-in — anthill graph BFS pathfinding and ant dispatch."""
+"""Lem-in — anthill graph BFS pathfinding and concurrent ant dispatch."""
 
 from std.pathlib import Path
-from libft.string import byte_at, ft_atoi, ft_itoa, ft_split, starts_with
+from libft.string import byte_at, ft_atoi, ft_itoa, ft_split
 
 @fieldwise_init
 struct Room(Copyable, Movable):
@@ -12,10 +12,10 @@ struct Room(Copyable, Movable):
 struct Anthill(Movable):
     var ants: Int
     var rooms: List[Room]
-    var edges: List[List[Int]]  # adjacency by room index
+    var edges: List[List[Int]]
     var start: Int
     var end: Int
-    var name_index: List[String]  # parallel names for lookup
+    var name_index: List[String]
 
     def __init__(out self):
         self.ants = 0
@@ -56,13 +56,13 @@ def parse_map(text: String) raises -> Anthill:
     while i < text.byte_length():
         var c = byte_at(text, i)
         if c == ord("\n"):
-            lines.append(cur)
+            lines.append(cur^)
             cur = String()
         else:
             cur += chr(c)
         i += 1
     if cur.byte_length() > 0:
-        lines.append(cur)
+        lines.append(cur^)
     if len(lines) == 0:
         raise Error("empty")
     hill.ants = ft_atoi(lines[0])
@@ -83,7 +83,6 @@ def parse_map(text: String) raises -> Anthill:
                 next_end = True
             i += 1
             continue
-        # link or room
         var has_dash = False
         var di = 0
         while di < line.byte_length():
@@ -92,7 +91,6 @@ def parse_map(text: String) raises -> Anthill:
                 break
             di += 1
         if has_dash and byte_at(line, 0) != ord("L"):
-            # link name-name
             var left = String()
             var right = String()
             var side = 0
@@ -124,7 +122,6 @@ def parse_map(text: String) raises -> Anthill:
     return hill^
 
 def bfs_path(hill: Anthill) -> List[Int]:
-    """Return room indices start→end, or empty if none."""
     var n = len(hill.rooms)
     var prev = List[Int]()
     var seen = List[Int]()
@@ -152,7 +149,6 @@ def bfs_path(hill: Anthill) -> List[Int]:
             e += 1
     if seen[hill.end] == 0:
         return List[Int]()
-    # reconstruct
     var path_rev = List[Int]()
     var cur = hill.end
     while cur != -1:
@@ -166,28 +162,64 @@ def bfs_path(hill: Anthill) -> List[Int]:
     return path^
 
 def solve_lemin(text: String) raises -> String:
+    """Reprint map, blank line, then concurrent moves (one line per turn)."""
     var hill = parse_map(text)
     var path = bfs_path(hill)
     if len(path) == 0:
         raise Error("no path")
     var out = String()
-    # subject style: reprint map, blank line, then moves
     out += text
     if text.byte_length() == 0 or byte_at(text, text.byte_length() - 1) != ord("\n"):
         out += "\n"
     out += "\n"
-    var ant = 1
-    while ant <= hill.ants:
-        # each ant walks path[1..]
-        var step = 1
-        while step < len(path):
-            out += "L"
-            out += ft_itoa(ant)
-            out += "-"
-            out += hill.rooms[path[step]].name
-            if step < len(path) - 1 or ant < hill.ants:
-                out += " "
-            step += 1
-        out += "\n"
-        ant += 1
+
+    # ant_pos[i] = index along path for ant i+1; 0 = still at start (not yet left)
+    var ant_pos = List[Int]()
+    var a = 0
+    while a < hill.ants:
+        ant_pos.append(0)
+        a += 1
+    var finished = 0
+    var launched = 0
+    var guard = 0
+    var path_len = len(path) - 1  # steps needed
+    while finished < hill.ants and guard < 100000:
+        guard += 1
+        var line = String()
+        var first = True
+        # launch at most one new ant per turn from start (simple single-path)
+        var can_launch = launched < hill.ants
+        # move existing ants first (from end backwards so rooms free)
+        var i = launched - 1
+        while i >= 0:
+            if ant_pos[i] < path_len:
+                ant_pos[i] = ant_pos[i] + 1
+                if not first:
+                    line += " "
+                first = False  # noqa
+                line += "L"
+                line += ft_itoa(i + 1)
+                line += "-"
+                line += hill.rooms[path[ant_pos[i]]].name
+                if ant_pos[i] == path_len:
+                    finished += 1
+            i -= 1
+        if can_launch:
+            # start room is path[0]; first move goes to path[1]
+            ant_pos[launched] = 1
+            if not first:
+                line += " "
+            first = False  # noqa
+            line += "L"
+            line += ft_itoa(launched + 1)
+            line += "-"
+            line += hill.rooms[path[1]].name
+            if path_len == 1:
+                finished += 1
+            launched += 1
+        if line.byte_length() > 0:
+            out += line
+            out += "\n"
+        else:
+            break
     return out^

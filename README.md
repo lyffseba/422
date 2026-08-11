@@ -34,6 +34,8 @@ bin/mrun                   # mojo run -I <repo root>
 See [`resources/CURRICULUM_MAP.md`](resources/CURRICULUM_MAP.md) for the
 skill-for-skill mapping from 421.
 
+New here? Read **[START_HERE.md](START_HERE.md)** first.
+
 ## Setup
 
 ```bash
@@ -49,6 +51,7 @@ pixi run mojo --version
 make verify   # trees present
 make check    # every smoke main exits 0
 make test     # functional suite (printf, push_swap|checker, fillit, …)
+make bench    # push_swap op counts for n=3..100
 ```
 
 ## Run examples

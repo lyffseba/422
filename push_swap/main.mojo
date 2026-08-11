@@ -8,6 +8,7 @@ def test_sort_three() raises:
     sort_small(p)
     assert_true(p.is_sorted())
     assert_equal(len(p.b), 0)
+    assert_true(len(p.ops) <= 3)
 
 def test_sort_five() raises:
     var vals: List[Int] = [5, 1, 4, 2, 3]
@@ -28,6 +29,18 @@ def test_checker_sa() raises:
     p.record = False
     p.apply("sa")
     assert_true(p.is_sorted())
+
+def test_radix_hundred_bound() raises:
+    var vals = List[Int]()
+    var i = 100
+    while i >= 1:
+        vals.append(i)
+        i -= 1
+    var p = Piles(vals)
+    sort_small(p)
+    assert_true(p.is_sorted())
+    # 42 common threshold for n=100 is 700
+    assert_true(len(p.ops) < 700)
 
 def main() raises:
     var args = argv()

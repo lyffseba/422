@@ -22,7 +22,14 @@ from .string import (
     ft_strlen,
     ft_strnequ,
     ft_strncpy,
+    ft_substr,
+    ft_strchr,
+    ft_strstr,
+    ft_strtrim,
+    starts_with,
+    strip_newline,
     byte_at,
 )
 from .list import LinkedList, ListNode
 from .put import ft_putchar, ft_putendl, ft_putnbr, ft_putstr
+from .memory import ft_memcpy_list, ft_memcmp_list, ft_swap_int

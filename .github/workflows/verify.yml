@@ -14,14 +14,10 @@ jobs:
           export PATH="$HOME/.pixi/bin:$PATH"
           pixi install
       - name: verify trees
-        run: |
-          export PATH="$HOME/.pixi/bin:$PATH"
-          make verify
+        run: export PATH="$HOME/.pixi/bin:$PATH" && make verify
       - name: build smoke
-        run: |
-          export PATH="$HOME/.pixi/bin:$PATH"
-          make check
+        run: export PATH="$HOME/.pixi/bin:$PATH" && make check
       - name: functional tests
-        run: |
-          export PATH="$HOME/.pixi/bin:$PATH"
-          make test
+        run: export PATH="$HOME/.pixi/bin:$PATH" && make test
+      - name: bench push_swap
+        run: export PATH="$HOME/.pixi/bin:$PATH" && make bench

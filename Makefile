@@ -5,7 +5,7 @@ TREES = piscine_reloaded libft get_next_line fillit ft_printf \
 SMOKE = libft get_next_line fillit ft_printf push_swap lem_in corewar fdf fractol
 MRUN = ./bin/mrun
 
-.PHONY: all verify check test clean help
+.PHONY: all verify check test bench clean help
 
 all: verify
 
@@ -13,6 +13,7 @@ help:
 	@echo "make verify  - every project tree present"
 	@echo "make check   - run each smoke main (fails on error)"
 	@echo "make test    - full functional suite"
+	@echo "make bench   - push_swap operation counts"
 	@echo "make clean   - remove temp artifacts"
 	@echo "./bin/mrun <file.mojo> [args...]  - run with package path"
 
@@ -46,5 +47,8 @@ check: verify
 test: verify
 	@./scripts/test.sh
 
+bench: verify
+	@./scripts/bench.sh
+
 clean:
-	@rm -f /tmp/422_*.out /tmp/422_*.err /tmp/gnl_422.txt /tmp/ps_ops.txt
+	@rm -f /tmp/422_*.out /tmp/422_*.err /tmp/gnl_422.txt /tmp/ps_ops.txt /tmp/422u_*.out /tmp/422u_*.err
