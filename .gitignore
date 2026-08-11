@@ -1,0 +1,13 @@
+.pixi/
+.pixi
+pixi.lock.bak
+*.mojopkg
+*.pyc
+__pycache__/
+.DS_Store
+.ipynb_checkpoints/
+*.out
+*.err
+/tmp/
+.idea/
+.vscode/
