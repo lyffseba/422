@@ -186,7 +186,6 @@ def solve_lemin(text: String) raises -> String:
     while finished < hill.ants and guard < 100000:
         guard += 1
         var line = String()
-        var first = True
         # launch at most one new ant per turn from start (simple single-path)
         var can_launch = launched < hill.ants
         # move existing ants first (from end backwards so rooms free)
@@ -194,9 +193,8 @@ def solve_lemin(text: String) raises -> String:
         while i >= 0:
             if ant_pos[i] < path_len:
                 ant_pos[i] = ant_pos[i] + 1
-                if not first:
+                if line.byte_length() > 0:
                     line += " "
-                first = False  # noqa
                 line += "L"
                 line += ft_itoa(i + 1)
                 line += "-"
@@ -207,9 +205,8 @@ def solve_lemin(text: String) raises -> String:
         if can_launch:
             # start room is path[0]; first move goes to path[1]
             ant_pos[launched] = 1
-            if not first:
+            if line.byte_length() > 0:
                 line += " "
-            first = False  # noqa
             line += "L"
             line += ft_itoa(launched + 1)
             line += "-"

@@ -23,7 +23,10 @@ def test_lemin_has_turns() raises:
 def main() raises:
     var args = argv()
     if len(args) >= 2:
-        var text = Path(args[1]).read_text()
-        print(solve_lemin(text), end="")
+        try:
+            var text = Path(args[1]).read_text()
+            print(solve_lemin(text), end="")
+        except e:
+            print("Error")
         return
     TestSuite.discover_tests[__functions_in_module()]().run()

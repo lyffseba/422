@@ -28,14 +28,17 @@ def test_file_champ() raises:
 def main() raises:
     var args = argv()
     if len(args) >= 2:
-        var src = Path(args[1]).read_text()
-        var prog = assemble_source(src)
-        var vm = VM(prog)
-        vm.run()
-        var i = 0
-        while i < len(vm.output):
-            print(vm.output[i])
-            i += 1
+        try:
+            var src = Path(args[1]).read_text()
+            var prog = assemble_source(src)
+            var vm = VM(prog)
+            vm.run()
+            var i = 0
+            while i < len(vm.output):
+                print(vm.output[i])
+                i += 1
+        except e:
+            print("Error")
         return
     var prog = assemble_demo_countdown()
     var vm = VM(prog)
