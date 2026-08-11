@@ -3,15 +3,15 @@
 | 421 (C) | 422 (Mojo) | Skills |
 |---------|------------|--------|
 | piscine_reloaded | piscine_reloaded | syntax, loops, recursion, files |
-| libft | libft | packages, strings, lists |
+| libft | libft | packages, strings, lists, ownership |
 | get_next_line | get_next_line | buffering, state machines |
-| fillit | fillit | backtracking |
-| ft_printf | ft_printf | format parsing |
-| push_swap | push_swap | stacks, sorting constraints |
-| lem_in | lem_in | graphs, BFS |
-| corewar | corewar | VM / assembler |
+| fillit | fillit | backtracking, geometry |
+| ft_printf | ft_printf | format parsing, bases |
+| push_swap | push_swap + checker | stacks, constrained sorting |
+| lem_in | lem_in | graphs, BFS, dispatch |
+| corewar | corewar | VM fetch/decode/execute, asm |
 | fdf | fdf | grids, projection |
-| fractol | fractol | numerics, fractals |
-| roger_skyline_1 | roger_skyline_1 | toolchain / ops hygiene |
-| php_piscine | python_piscine | language interop |
-| workshops_machinelearning | workshops_machinelearning | applied ML numerics |
+| fractol | fractol | numerics, complex iteration |
+| roger_skyline_1 | roger_skyline_1 | reproducible toolchains (pixi) |
+| php_piscine | php_piscine → python_piscine | secondary language / interop |
+| workshops_machinelearning | workshops_machinelearning | applied numerics / ML basics |

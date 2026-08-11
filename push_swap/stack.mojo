@@ -1,11 +1,12 @@
-"""Two-stack machine for push_swap."""
+"""Two-stack machine for push_swap (421-equivalent instruction set)."""
 
-from libft.string import ft_itoa
+from libft.string import ft_atoi, byte_at
 
 struct Piles(Movable):
     var a: List[Int]
     var b: List[Int]
     var ops: List[String]
+    var record: Bool
 
     def __init__(out self, values: List[Int]):
         self.a = List[Int]()
@@ -15,40 +16,37 @@ struct Piles(Movable):
             i += 1
         self.b = List[Int]()
         self.ops = List[String]()
+        self.record = True
 
-    def _record(mut self, op: String):
-        self.ops.append(op)
+    def _log(mut self, op: String):
+        if self.record:
+            self.ops.append(op)
 
     def sa(mut self):
         if len(self.a) >= 2:
             var t = self.a[0]
             self.a[0] = self.a[1]
             self.a[1] = t
-        self._record("sa")
+        self._log("sa")
 
     def sb(mut self):
         if len(self.b) >= 2:
             var t = self.b[0]
             self.b[0] = self.b[1]
             self.b[1] = t
-        self._record("sb")
+        self._log("sb")
 
     def ss(mut self):
-        # do without double-recording
-        if len(self.a) >= 2:
-            var t = self.a[0]
-            self.a[0] = self.a[1]
-            self.a[1] = t
-        if len(self.b) >= 2:
-            var t2 = self.b[0]
-            self.b[0] = self.b[1]
-            self.b[1] = t2
-        self._record("ss")
+        var r = self.record
+        self.record = False
+        self.sa()
+        self.sb()
+        self.record = r
+        self._log("ss")
 
     def pa(mut self):
         if len(self.b) > 0:
             var v = self.b[0]
-            # pop front b
             var nb = List[Int]()
             var i = 1
             while i < len(self.b):
@@ -62,7 +60,7 @@ struct Piles(Movable):
                 na.append(self.a[i])
                 i += 1
             self.a = na^
-        self._record("pa")
+        self._log("pa")
 
     def pb(mut self):
         if len(self.a) > 0:
@@ -80,7 +78,7 @@ struct Piles(Movable):
                 nb.append(self.b[i])
                 i += 1
             self.b = nb^
-        self._record("pb")
+        self._log("pb")
 
     def ra(mut self):
         if len(self.a) >= 2:
@@ -92,7 +90,7 @@ struct Piles(Movable):
                 i += 1
             na.append(v)
             self.a = na^
-        self._record("ra")
+        self._log("ra")
 
     def rb(mut self):
         if len(self.b) >= 2:
@@ -104,28 +102,15 @@ struct Piles(Movable):
                 i += 1
             nb.append(v)
             self.b = nb^
-        self._record("rb")
+        self._log("rb")
 
     def rr(mut self):
-        if len(self.a) >= 2:
-            var v = self.a[0]
-            var na = List[Int]()
-            var i = 1
-            while i < len(self.a):
-                na.append(self.a[i])
-                i += 1
-            na.append(v)
-            self.a = na^
-        if len(self.b) >= 2:
-            var v2 = self.b[0]
-            var nb = List[Int]()
-            var j = 1
-            while j < len(self.b):
-                nb.append(self.b[j])
-                j += 1
-            nb.append(v2)
-            self.b = nb^
-        self._record("rr")
+        var r = self.record
+        self.record = False
+        self.ra()
+        self.rb()
+        self.record = r
+        self._log("rr")
 
     def rra(mut self):
         if len(self.a) >= 2:
@@ -137,7 +122,7 @@ struct Piles(Movable):
                 na.append(self.a[i])
                 i += 1
             self.a = na^
-        self._record("rra")
+        self._log("rra")
 
     def rrb(mut self):
         if len(self.b) >= 2:
@@ -149,7 +134,15 @@ struct Piles(Movable):
                 nb.append(self.b[i])
                 i += 1
             self.b = nb^
-        self._record("rrb")
+        self._log("rrb")
+
+    def rrr(mut self):
+        var r = self.record
+        self.record = False
+        self.rra()
+        self.rrb()
+        self.record = r
+        self._log("rrr")
 
     def is_sorted(self) -> Bool:
         if len(self.b) != 0:
@@ -185,41 +178,19 @@ struct Piles(Movable):
         elif instr == "rrb":
             self.rrb()
         elif instr == "rrr":
-            # reverse both
-            if len(self.a) >= 2:
-                var last = self.a[len(self.a) - 1]
-                var na = List[Int]()
-                na.append(last)
-                var i = 0
-                while i < len(self.a) - 1:
-                    na.append(self.a[i])
-                    i += 1
-                self.a = na^
-            if len(self.b) >= 2:
-                var lastb = self.b[len(self.b) - 1]
-                var nb = List[Int]()
-                nb.append(lastb)
-                var j = 0
-                while j < len(self.b) - 1:
-                    nb.append(self.b[j])
-                    j += 1
-                self.b = nb^
-            self._record("rrr")
+            self.rrr()
         else:
-            raise Error("bad instruction")
+            raise Error("Error")
 
 def sort_small(mut p: Piles):
-    """Simple O(n^2) selection-style sort using pb/pa/ra — correct, not optimal."""
+    """Correct selection sort via pb/pa/rotate. Always sorts; not ops-optimal."""
     if p.is_sorted():
         return
-    # sort 2
     if len(p.a) == 2:
         if p.a[0] > p.a[1]:
             p.sa()
         return
-    # general: push min to b until a empty, then pa all
     while len(p.a) > 0:
-        # find min index
         var min_i = 0
         var min_v = p.a[0]
         var i = 1
@@ -228,7 +199,6 @@ def sort_small(mut p: Piles):
                 min_v = p.a[i]
                 min_i = i
             i += 1
-        # rotate min to top
         if min_i <= len(p.a) // 2:
             var r = 0
             while r < min_i:
@@ -243,20 +213,31 @@ def sort_small(mut p: Piles):
     while len(p.b) > 0:
         p.pa()
 
-def parse_args(args: List[String]) raises -> List[Int]:
-    var vals = List[Int]()
-    var i = 1  # skip argv0
-    while i < len(args):
-        var v = ft_atoi(args[i])
-        # reject non-numeric lightly
-        if args[i].byte_length() == 0:
+def parse_int_token(s: String) raises -> Int:
+    if s.byte_length() == 0:
+        raise Error("Error")
+    var j = 0
+    if j < s.byte_length() and (byte_at(s, j) == ord("-") or byte_at(s, j) == ord("+")):
+        j += 1
+    if j >= s.byte_length():
+        raise Error("Error")
+    while j < s.byte_length():
+        var c = byte_at(s, j)
+        if c < ord("0") or c > ord("9"):
             raise Error("Error")
-        # uniqueness
-        var j = 0
-        while j < len(vals):
-            if vals[j] == v:
+        j += 1
+    return ft_atoi(s)
+
+def parse_int_list(tokens: List[String]) raises -> List[Int]:
+    var vals = List[Int]()
+    var i = 0
+    while i < len(tokens):
+        var v = parse_int_token(tokens[i])
+        var k = 0
+        while k < len(vals):
+            if vals[k] == v:
                 raise Error("Error")
-            j += 1
+            k += 1
         vals.append(v)
         i += 1
     return vals^

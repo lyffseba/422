@@ -171,7 +171,11 @@ def solve_lemin(text: String) raises -> String:
     if len(path) == 0:
         raise Error("no path")
     var out = String()
-    # echo input first (subject style simplified: just moves)
+    # subject style: reprint map, blank line, then moves
+    out += text
+    if text.byte_length() == 0 or byte_at(text, text.byte_length() - 1) != ord("\n"):
+        out += "\n"
+    out += "\n"
     var ant = 1
     while ant <= hill.ants:
         # each ant walks path[1..]

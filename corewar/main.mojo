@@ -1,3 +1,5 @@
+from std.sys.arg import argv
+from std.pathlib import Path
 from std.testing import assert_equal, TestSuite
 from corewar.vm import VM, assemble_demo_countdown, assemble_source
 
@@ -16,7 +18,25 @@ def test_asm() raises:
     vm.run()
     assert_equal(vm.output[0], "15")
 
+def test_file_champ() raises:
+    var src = Path("corewar/resources/champs/add.s").read_text()
+    var prog = assemble_source(src)
+    var vm = VM(prog)
+    vm.run()
+    assert_equal(vm.output[0], "42")
+
 def main() raises:
+    var args = argv()
+    if len(args) >= 2:
+        var src = Path(args[1]).read_text()
+        var prog = assemble_source(src)
+        var vm = VM(prog)
+        vm.run()
+        var i = 0
+        while i < len(vm.output):
+            print(vm.output[i])
+            i += 1
+        return
     var prog = assemble_demo_countdown()
     var vm = VM(prog)
     vm.run()

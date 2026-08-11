@@ -12,6 +12,16 @@ def test_printf_basic() raises:
     var s = ft_sprintf("%d %s %x %X %u %o %%", args)
     assert_equal(s, "42 hi ff FF 42 10 %")
 
+def test_printf_char() raises:
+    var args = FormatArgs()
+    args.add_int(ord("Z"))
+    assert_equal(ft_sprintf("%c", args), "Z")
+
+def test_printf_neg() raises:
+    var args = FormatArgs()
+    args.add_int(-42)
+    assert_equal(ft_sprintf("%d", args), "-42")
+
 def main() raises:
     var args = FormatArgs()
     args.add_int(42)

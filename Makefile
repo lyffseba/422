@@ -1,8 +1,9 @@
 TREES = piscine_reloaded libft get_next_line fillit ft_printf \
 	push_swap lem_in corewar fdf fractol roger_skyline_1 \
-	python_piscine workshops_machinelearning resources
+	php_piscine python_piscine workshops_machinelearning resources
 
 SMOKE = libft get_next_line fillit ft_printf push_swap lem_in corewar fdf fractol
+MRUN = ./bin/mrun
 
 .PHONY: all verify check test clean help
 
@@ -10,9 +11,10 @@ all: verify
 
 help:
 	@echo "make verify  - every project tree present"
-	@echo "make check   - compile/run each smoke main (fails on error)"
-	@echo "make test    - functional suite (scripts/test.sh)"
+	@echo "make check   - run each smoke main (fails on error)"
+	@echo "make test    - full functional suite"
 	@echo "make clean   - remove temp artifacts"
+	@echo "./bin/mrun <file.mojo> [args...]  - run with package path"
 
 verify:
 	@fail=0; \
@@ -21,6 +23,7 @@ verify:
 			echo "missing $$t"; fail=1; \
 		fi; \
 	done; \
+	if [ ! -x bin/mrun ]; then echo "missing bin/mrun"; fail=1; fi; \
 	if [ "$$fail" -ne 0 ]; then exit 1; fi; \
 	echo "verify ok"
 
@@ -28,7 +31,7 @@ check: verify
 	@fail=0; \
 	for t in $(SMOKE); do \
 		echo "++ $$t"; \
-		if pixi run mojo run -I . $$t/main.mojo > /tmp/422_$$t.out 2> /tmp/422_$$t.err; then \
+		if $(MRUN) $$t/main.mojo > /tmp/422_$$t.out 2> /tmp/422_$$t.err; then \
 			echo "ok  $$t"; \
 		else \
 			echo "FAIL $$t"; \

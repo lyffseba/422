@@ -1,13 +1,12 @@
-"""Day 00: Python interop hello (graceful if Python bridge unavailable)."""
+"""Day 00 — call CPython from Mojo (maps to 421 php_piscine day0 spirit)."""
 
-def main():
+from std.python import Python
+
+def main() raises:
     print("python_piscine day00")
-    try:
-        from python import Python
-        var py = Python.import_module("math")
-        var v = py.sqrt(16)
-        print("math.sqrt(16) via Python =", v)
-    except e:
-        print("Python interop not available in this environment:")
-        print(e)
-        print("Mojo-native fallback:", 4)
+    var math = Python.import_module("math")
+    var builtins = Python.import_module("builtins")
+    var root = math.sqrt(16)
+    print("math.sqrt(16) =", root)
+    var nums = Python.list(1, 2, 3, 4)
+    print("sum via Python =", builtins.sum(nums))

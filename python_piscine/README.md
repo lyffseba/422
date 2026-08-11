@@ -1,13 +1,19 @@
-# python_piscine (Mojo ↔ Python interop)
+# python_piscine (Mojo ↔ Python)
 
-Maps to 421 `php_piscine` as the **web/adjacent language** track.
-In Mojo, the natural dual is **Python interop** (call Python from Mojo and
-eventually Mojo from Python).
+Maps to 421 **`php_piscine`**: the secondary-language track.
 
-## Day 00 — call Python from Mojo
+Here that means **Python interop** — Mojo’s real bridge language.
+
+| Day | Topic |
+|-----|-------|
+| `day00` | `Python.import_module`, call stdlib |
+| `day01` | dict/list round-trip |
+| `day02` | pure-Mojo status table drill |
 
 ```bash
-pixi run mojo run python_piscine/day00/main.mojo
+./bin/mrun python_piscine/day00/main.mojo
+./bin/mrun python_piscine/day01/main.mojo
+./bin/mrun python_piscine/day02/main.mojo
 ```
 
-Requires the Mojo Python bindings available in the environment.
+Requires the `python` dependency from `pixi.toml`.

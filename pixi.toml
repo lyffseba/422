@@ -9,6 +9,8 @@ platforms = ["osx-arm64", "linux-64"]
 verify = "make verify"
 check = "make check"
 test = "make test"
+mrun = "./bin/mrun"
 
 [dependencies]
 mojo = ">=1.0.0b2,<2"
+python = ">=3.12,<3.15"

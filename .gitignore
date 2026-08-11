@@ -1,6 +1,4 @@
 .pixi/
-.pixi
-pixi.lock.bak
 *.mojopkg
 *.pyc
 __pycache__/
@@ -8,6 +6,5 @@ __pycache__/
 .ipynb_checkpoints/
 *.out
 *.err
-/tmp/
 .idea/
 .vscode/

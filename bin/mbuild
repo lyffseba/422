@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+ROOT="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+exec pixi run mojo build -I "$ROOT" "$@"

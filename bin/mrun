@@ -1,0 +1,6 @@
+#!/bin/sh
+# Run a Mojo file with repo root on the package path.
+set -e
+ROOT="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+exec pixi run mojo run -I "$ROOT" "$@"

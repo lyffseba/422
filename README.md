@@ -1,91 +1,83 @@
 # 422
 
 Mojo-native twin of [421](https://github.com/lyffseba/421) — the same École 42
-curriculum ladder (structure, purpose, progression), implemented in
+curriculum ladder (order, purpose, project roles), implemented in
 **[Mojo 1.0](https://mojolang.org/docs/manual/)** instead of C.
 
-Learn systems fundamentals twice: once in C (`421`), once in Mojo (`422`).
+| | |
+|-|-|
+| C vault | [`lyffseba/421`](https://github.com/lyffseba/421) |
+| Mojo vault | **this repo** |
+| Language | Mojo **1.0.0b2+** via [pixi](https://pixi.sh/) |
 
 ## Contents
 
-Curriculum order (top → bottom):
-
 ```
-piscine_reloaded/
-libft/
-get_next_line/
-fillit/
-ft_printf/
-push_swap/
-lem_in/
-corewar/
-fdf/
-fractol/
-roger_skyline_1/
-python_piscine/
-workshops_machinelearning/
-resources/
+piscine_reloaded/          # ex00–ex27 drills
+libft/                     # utility package
+get_next_line/             # buffered line reader
+fillit/                    # tetrimino backtracking
+ft_printf/                 # format-string printer
+push_swap/                 # two-stack sort + checker
+lem_in/                    # graph BFS + ants
+corewar/                   # tiny VM + assembler
+fdf/                       # ASCII wireframe maps
+fractol/                   # Mandelbrot / Julia
+roger_skyline_1/           # toolchain / ops hygiene
+php_piscine/               # pointer → python_piscine (421 parity)
+python_piscine/            # Mojo ↔ Python interop track
+workshops_machinelearning/ # OLS + k-means labs
+resources/                 # Mojo Norm + 421↔422 map
+bin/mrun                   # mojo run -I <repo root>
 ```
 
-| Path | Project | Notes |
-|------|---------|-------|
-| `piscine_reloaded/` | Piscine Reloaded | Mojo basics (ex00–ex27) |
-| `libft/` | Libft | string/list utility package |
-| `get_next_line/` | Get Next Line | buffered line reader |
-| `fillit/` | Fillit | tetrimino backtracking |
-| `ft_printf/` | ft_printf | format-string printer |
-| `push_swap/` | Push swap | two-stack sort |
-| `lem_in/` | Lem-in | graph BFS + ants |
-| `corewar/` | Corewar | tiny VM + assembler |
-| `fdf/` | FdF | ASCII wireframe maps |
-| `fractol/` | Fract'ol | Mandelbrot / Julia |
-| `roger_skyline_1/` | Roger-Skyline-1 | toolchain / ops hygiene |
-| `python_piscine/` | Python interop | maps 421 php_piscine |
-| `workshops_machinelearning/` | 42AI-style labs | regression, k-means |
-| `resources/MOJO_NORM.md` | Style guide | Mojo Norm |
-| `resources/CURRICULUM_MAP.md` | 421↔422 map | skill alignment |
+See [`resources/CURRICULUM_MAP.md`](resources/CURRICULUM_MAP.md) for the
+skill-for-skill mapping from 421.
 
-## Requirements
-
-- [pixi](https://pixi.sh/)
-- Mojo **1.0.0b2+** (installed via `pixi.toml`)
+## Setup
 
 ```bash
-curl -fsSL https://pixi.sh/install.sh | sh
+curl -fsSL https://pixi.sh/install.sh | sh   # once
 cd 422
 pixi install
 pixi run mojo --version
 ```
 
-## Build & test
+## Verify / test
 
 ```bash
 make verify   # trees present
-make check    # run each smoke main (fails on error)
-make test     # functional suite
+make check    # every smoke main exits 0
+make test     # functional suite (printf, push_swap|checker, fillit, …)
 ```
 
-Or directly:
+## Run examples
+
+Always use the wrapper so packages resolve from the repo root:
 
 ```bash
-pixi run mojo run -I . libft/main.mojo
-pixi run mojo run -I . push_swap/main.mojo 4 3 2 1
-pixi run mojo run -I . fractol/main.mojo mandelbrot
+./bin/mrun libft/main.mojo
+./bin/mrun push_swap/main.mojo 5 4 3 2 1
+./bin/mrun push_swap/main.mojo 5 4 3 2 1 | ./bin/mrun push_swap/checker.mojo 5 4 3 2 1
+./bin/mrun fillit/main.mojo fillit/resources/valid_files/test2
+./bin/mrun lem_in/main.mojo lem_in/resources/valid_maps/simple
+./bin/mrun corewar/main.mojo corewar/resources/champs/add.s
+./bin/mrun fractol/main.mojo mandelbrot
+./bin/mrun python_piscine/day00/main.mojo
 ```
 
-## Design notes
+Equivalent: `pixi run mojo run -I . <file> [args…]`.
 
-- Packages use `__init__.mojo` and are imported as `from libft.string import …`.
-- Mojo 1.0 has no C varargs — `ft_printf` uses an explicit `FormatArgs` bag
-  while still teaching format parsing.
-- Graphics projects render ASCII/PGM (no MiniLibX); algorithms stay faithful.
-- `python_piscine` replaces PHP with Mojo↔Python interop.
+## Design choices (intentional)
 
-## Provenance
-
-Scaffolding and Mojo ports are original to this repository (MIT).
-Pedagogical structure follows the public 42 project ladder mirrored in
-[lyffseba/421](https://github.com/lyffseba/421).
+| 421 | 422 |
+|-----|-----|
+| `libft.a` + headers | Mojo package `libft/` with `__init__.mojo` |
+| C varargs `ft_printf` | `FormatArgs` bag + format parser (same skill) |
+| MiniLibX FdF/Fractol | ASCII / PGM renderers (same math) |
+| Full Corewar `.cor` | Educational VM + text assembler |
+| PHP piscine | `python_piscine` (+ `php_piscine/` stub for tree parity) |
+| Norm (C) | [`resources/MOJO_NORM.md`](resources/MOJO_NORM.md) |
 
 ## Links
 
